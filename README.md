@@ -16,7 +16,9 @@ the canonical versions. (There are a few exceptions such as Zodiac signs, to for
 
 The data files included in this repository are the latest versions of emoji, and include version information so your application can make sure that your OS will support the emoji you want to use.
 
-![Handshake with two different skin tones](readme-images/handshake.png)
+<p align="center" width="100%">
+    <img width="33%" src="readme-images/handshake.png" alt="Handshake with two different skin tones">
+</p>
 
 ## Future Maintenance
 
