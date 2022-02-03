@@ -90,7 +90,9 @@ This file contains several structures and methods we use for parsing and manipul
       * For an emoji that supports two skin tones. It converts the two-tone emoji that is that starting point into using the desired tones.
 
 
-
+<p align="center" width="100%">
+    <img width="437" src="readme-images/multi-tone-handshake.png" alt="Several different handshakes with multiple skin tones">
+</p>
 
 ---
 
@@ -130,7 +132,7 @@ compensate for that.
 
 ## Emoji Documentation
 
-[Emoji 14.0](https://emojipedia.org/emoji-14.0/)
+[Emoji 14.0](https://emojipedia.org/emoji-14.0/) at Emojipedia
 
 [Latest version of Emoji parsed is 14.0, from 2021. Released in MacOS 12.3](https://unicode.org/emoji/charts/emoji-versions.html)
 (Emoji 13.0 was in Big Sur and Monterey through 12.2. Emoji 12.1 was in Catalina starting with 10.15.1 — I'm not sure about older OS versions.)
