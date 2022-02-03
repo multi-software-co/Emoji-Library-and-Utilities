@@ -16,6 +16,8 @@ the canonical versions. (There are a few exceptions such as Zodiac signs, to for
 
 The data files included in this repository are the latest versions of emoji, and include version information so your application can make sure that your OS will support the emoji you want to use.
 
+![Handshake with two different skin tones](readme-images/handshake.png)
+
 ## Future Maintenance
 
 Check back on this repository after a new version of Emoji is released for the latest data updates. Or, update the data files and run this again when there is a new version of Unicode/Emoji released or announced. Be sure to test and look for inconsistencies that might need to be adjusted.
@@ -68,7 +70,7 @@ This file contains several structures and methods we use for parsing and manipul
 `struct EmojiGroup`
 * A group of emoji with its name and a list of emoji in that group. Also contains flag to indicate if skin tones are supported in this group.
 * `func loadEmojiGroupsFrom(data emojiData: Data) -> [EmojiGroup]`
-      * Utility method to load emojis from the **Categories.csv** file.
+   * Utility method to load emojis from the **Categories.csv** file.
 
 `struct EmojiInfo`
 * A single emoji string with information about skin-tone support.
@@ -84,19 +86,6 @@ This file contains several structures and methods we use for parsing and manipul
       * For an emoji that supports a single skin tone, converts the "base" (toneless) emoji to the given skin tone.
    * `func replacingSkinTones(_ tone: SkinTone, _ tone2: SkinTone) -> String`
       * For an emoji that supports two skin tones. It converts the two-tone emoji that is that starting point into using the desired tones.
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -134,6 +123,8 @@ The binary-formatted file is at:
 It needs to be converted to json using `plutil -convert json AppleName.strings`.
 From this file it is clear that Apple supports zodiac emoji that have purple badges, not just the characters listed in emoji-test.txt, so we
 compensate for that.
+
+---
 
 ## Emoji Documentation
 
