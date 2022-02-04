@@ -286,18 +286,20 @@ extension String {
     }
 
     /// For an emoji that supports two skin tones. It converts the two-tone emoji that is that starting point into using the desired tones.
-    func replacingSkinTones(_ tone: SkinTone, _ tone2: SkinTone) -> String {
-        // Replace the 1F3FB with tone; 1F3FF with tone2
-        guard let toneScalar = Unicode.Scalar(tone.rawValue),
-              let tone2Scalar = Unicode.Scalar(tone2.rawValue) else { return self }
+    func replacingSkinTones(_ tone1: SkinTone, _ tone2: SkinTone) -> String {
+        // Replace the first tone scalar with tone1 and second tone scalar with tone2
+        guard let tone1Scalar = Unicode.Scalar(tone1.rawValue),
+              let tone2Scalar = Unicode.Scalar(tone2.rawValue),
+              let first: UInt32 = SkinTone.allCases.first?.rawValue,
+              let last: UInt32 = SkinTone.allCases.last?.rawValue else { return self }
 
         var scalars = [UnicodeScalar]()
+        var hasAppendedTone1: Bool = false
 
         for scalar in unicodeScalars {
-            if scalar.value == 0x1F3FB {
-                scalars.append(toneScalar)
-            } else if scalar.value == 0x1F3FF {
-                scalars.append(tone2Scalar)
+            if first ... last ~= scalar.value {
+                scalars.append(hasAppendedTone1 ? tone1Scalar : tone2Scalar)
+                hasAppendedTone1 = true
             } else {
                 scalars.append(scalar)
             }
