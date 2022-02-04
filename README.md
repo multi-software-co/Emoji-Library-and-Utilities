@@ -55,7 +55,7 @@ When loading into the client, be sure to ignore emoji that aren't compatible wit
 ---
 ## EmojiUtilities.swift
 
-This file contains several structures and methods we use for parsing and manipulating emoji. 
+This file contains several structures and methods we use for parsing and manipulating emoji as read from Categories.csv.
 
 `protocol EmojiListProtocol`
 * Implement this protocol to load the emojis from disk and maintain a list of categories, each containing emoji.
