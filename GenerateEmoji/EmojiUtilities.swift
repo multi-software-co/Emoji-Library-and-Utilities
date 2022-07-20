@@ -298,7 +298,7 @@ extension String {
 
         for scalar in unicodeScalars {
             if first ... last ~= scalar.value {
-                scalars.append(hasAppendedTone1 ? tone1Scalar : tone2Scalar)
+                scalars.append(!hasAppendedTone1 ? tone1Scalar : tone2Scalar)
                 hasAppendedTone1 = true
             } else {
                 scalars.append(scalar)

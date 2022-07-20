@@ -32,7 +32,7 @@ private struct EmojiFullInfo {
 
 class EmojiParser: NSObject, XMLParserDelegate {
     
-    static let latestKnownEmojiVersion: Double = 14.0  // corresponding to emoji-test.txt and en.xml data files, which may not be known in OS yet
+    static let latestKnownEmojiVersion: Double = 15.0  // corresponding to emoji-test.txt and en.xml data files, which may not be known in OS yet
     static let latestSupportedEmojiVersion: Double = 14.0   // and to the version supported in this operating system including AppleName.strings
     
     // MARK: - Additional Search Terms
@@ -427,12 +427,12 @@ class EmojiParser: NSObject, XMLParserDelegate {
                     if capturedSkinToneStrings.count == 1, let skinTone: SkinTone = skinTones.first, let baseString = currentEmoji?.string   {
                         let generatedToned = baseString.addingOneSkinTone(skinTone)
                         if generatedToned != emoji {
-                            print("⭕️ Given toned \(emoji) \(emoji.dumpScalars) != generated \(generatedToned) \(generatedToned.dumpScalars)")
+                            print("⭕️ Given one-toned \(emoji) \(emoji.dumpScalars) != generated \(generatedToned) \(generatedToned.dumpScalars)")
                         }
                     } else if capturedSkinToneStrings.count == 2, let baseString = currentEmoji?.toneBaseString   {
                         let generatedToned = baseString.replacingSkinTones(skinTones[0], skinTones[1])
                         if generatedToned != emoji {
-                            print("⭕️ Given toned \(emoji) \(emoji.dumpScalars) != generated \(generatedToned) \(generatedToned.dumpScalars)")
+                            print("⭕️ Given two-toned \(emoji) \(emoji.dumpScalars) != generated \(generatedToned) \(generatedToned.dumpScalars)")
                         }
                     } 
                     

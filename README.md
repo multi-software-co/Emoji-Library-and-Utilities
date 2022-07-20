@@ -1,6 +1,6 @@
 # Remotion Emoji Library & Utilities
 
-[![Emoji Version - 14.0](https://img.shields.io/badge/Emoji_Version-14.0-2ea44f)](https://unicode.org/Public/emoji/14.0/emoji-test.txt)
+[![Emoji Version - 15.0](https://img.shields.io/badge/Emoji_Version-15.0-2ea44f)](https://unicode.org/Public/emoji/15.0/emoji-test.txt)
 
 
 
@@ -109,7 +109,7 @@ Make sure that the skin tones look as expected - if the emoji version is greater
 
 [The latest annotations file from CLDR (Common Locale Data Repository)](https://github.com/unicode-org/cldr/blob/main/common/annotations/en.xml)
 
-* Currently this goes up to Unicode 14.0.
+* Currently this goes up to Unicode 15.0.
 * This is English; we could maybe have different versions for other languages.
 * The "tts" lines indicate the main annotation to use (e.g. tooltips); the other strings are good for searching.
 * Note that this also contains non-emoji characters (like symbols) so we need to filter those out using the list below. Also, many of the characters are encoded in a not "fully-qualified" way, so our cross-referencing has to repair this.
@@ -117,7 +117,7 @@ Make sure that the skin tones look as expected - if the emoji version is greater
 
 ### Emoji List
 
-For the categories, an ordered list of all supported emoji, unicode versions, and skin-tone variations, we parse the [latest version of this file](https://unicode.org/Public/emoji/latest/emoji-test.txt).
+For the categories, an ordered list of all supported emoji, unicode versions, and skin-tone variations, we parse the [latest version of this file](https://unicode.org/Public/emoji/latest/emoji-test.txt). (Note that this links to the latest *released* version, so there may be a newer version than this.)
 
 ### AppleName.strings
 
@@ -132,10 +132,10 @@ compensate for that.
 
 ## Emoji Documentation
 
-[Emoji 14.0](https://emojipedia.org/emoji-14.0/) at Emojipedia
+[Emoji 15.0](https://emojipedia.org/emoji-15.0/) at Emojipedia
 
-[Latest version of Emoji parsed is 14.0, from 2021. Released in MacOS 12.3](https://unicode.org/emoji/charts/emoji-versions.html)
-(Emoji 13.0 was in Big Sur and Monterey through 12.2. Emoji 12.1 was in Catalina starting with 10.15.1 — I'm not sure about older OS versions.)
+[Latest version of Emoji parsed is 15.0, from 2022; not released in MacOS yet.](https://unicode.org/emoji/charts/emoji-versions.html)
+(Emoji 14.0 was released in MacOS 12.3; Emoji 13.0 was in Big Sur and Monterey through 12.2. Emoji 12.1 was in Catalina starting with 10.15.1 — I'm not sure about older OS versions.)
 
 [This seems to be the master overview file](http://www.unicode.org/reports/tr51/); it's a good overview of the Emoji data. See [#emoji-data](http://www.unicode.org/reports/tr51/#emoji-data) for links to data files
 
