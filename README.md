@@ -57,6 +57,8 @@ When loading into the client, be sure to ignore emoji that aren't compatible wit
 
 This file contains several structures and methods we use for parsing and manipulating emoji as read from Categories.csv.
 
+It currently supports up to Emoji 14.0; please update `emojiVersionSupportedInThisOSVersion` when a new version of MacOS has been released or announced that will support a subsequent version.
+
 `protocol EmojiListProtocol`
 * Implement this protocol to load the emojis from disk and maintain a list of categories, each containing emoji.
 * Through an extension, this file implements these methods:
