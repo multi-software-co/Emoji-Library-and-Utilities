@@ -9,8 +9,8 @@
 import Foundation
 
 protocol EmojiListProtocol {
-    static var sharedInstance: EmojiListProtocol { get }
-    
+    static var sharedInstance: any EmojiListProtocol { get }
+
     var allEmojiGroups: [EmojiGroup] { get }
 }
 
@@ -134,7 +134,7 @@ extension EmojiGroup {
         var groupName: String?
         var groupHasSkinTones: Bool = false
         var groupEmojis: [EmojiInfo] = []
-        
+
         func addGroupedEmojis() {
             if let groupName = groupName, !groupName.isEmpty {
                 let newGroup: EmojiGroup = EmojiGroup(groupName: groupName, emojis: groupEmojis, supportsSkinTones: groupHasSkinTones)
@@ -146,26 +146,29 @@ extension EmojiGroup {
             groupHasSkinTones = false
             groupEmojis = []
         }
-        
-        lazy var emojiVersionSupportedInThisOSVersion: Double = {
+
+        let emojiVersionSupportedInThisOSVersion: Double = {
             let version: OperatingSystemVersion = ProcessInfo.processInfo.operatingSystemVersion
             switch (version.majorVersion, version.minorVersion, version.patchVersion) {
-            case (10, 14, _): return 11.0 // Mojave only supports Emoji 11.0.
-            case (10, 15, 0): return 11.0 // NOT SURE NEED TO TEST … hard to find a 10.15.0 installation!
+            case (10, 14, _): return 11.0
+            case (10, 15, 0): return 12.0
             case (10, 15, _): return 12.1 // Catalina 10.15.1 and up do Emoji 12.1
             case (10, _, _): return 0 // Other older 10.x operating systems, just assume it's too early when a version # is required
-            case (11, _, _), (12, 0 ... 2, _): return 13.1 // Big Sur, older Monterey has Emoji 13.1
-            case (12, _, _): return 14.0 // Monterey 12.3 and above has Emoji 14.0
-            default: return 14.0 // We will need to update once versions > 12 are available; for now assume 14.0
+            case (11, 0 ... 2, _): return 13.0
+            case (11, _, _), (12, 0 ... 2, _): return 13.1 // newer Big Sur, older Monterey has Emoji 13.1
+            case (12, _, _), (13, _, _): return 14.0 // Emoji 14.0 in Monterey 12.3+ and early versions of Ventura
+                // Add new row for Emoji 15.0 when it's supported in a later version of Ventura
+
+            default: return 15.0 // the Emoji version we reasonably expect to be in the future OS version not listed here
             }
         }()
-        
+
         // Our emoji list indicates the version# each one was introduced starting with version 12.0. Earlier versions are not specified.
         func isSupported(version: Double?) -> Bool {
             guard let version = version else { return true } // if version is unspecified, assume compatible with ALL
             return emojiVersionSupportedInThisOSVersion >= version
         }
-        
+
         /// Returns EmojiInfo if it's supported in running OS. Also adjusts in case skin tones aren't supported in running OS.
         func parseEmoji(line: String) -> EmojiInfo? {
             let s: String // The emoji itself
@@ -173,11 +176,11 @@ extension EmojiGroup {
             let toneBaseString: String? // if supports 2 skin tones, use this basis rather than the main emoji
             let version: Double? // Version the emoji first appears in (starting with 12.0) or nil for lower versions
             let versionForTones: Double? // If a higher version is needed to show skin tones
-            
+
             let fields: [Substring] = line.split(separator: ",", omittingEmptySubsequences: false)
             guard fields.count > 0 else { return nil }
             s = String(fields[0])
-            
+
             if fields.count > 1 {
                 switch fields[1] {
                 case "1":
@@ -204,14 +207,14 @@ extension EmojiGroup {
             } else {
                 versionForTones = nil
             }
-            
+
             guard isSupported(version: version) else { return nil }
             let useTones: Bool = isSupported(version: versionForTones)
             return EmojiInfo(string: s,
                              toneSupport: useTones ? toneSupport : .none,
                              toneBaseString: useTones ? toneBaseString : nil)
         }
-        
+
         let lines: [Substring] = dataString.split(separator: "\n", omittingEmptySubsequences: false)
         for line in lines {
             if line.isEmpty {
@@ -236,7 +239,7 @@ extension EmojiGroup {
     }
 }
 
-// MARK: - Utility methods for manipulating emoji strings 
+// MARK: - Utility methods for manipulating emoji strings
 
 extension String {
     /// Add Variation Selector 0xFE0F to make a non-emoji into an emoji when applicable
