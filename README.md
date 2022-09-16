@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Getting a complete list of supported (in whatever OS you are running) emoji, and their annotations for tooltips (with additional annotations for searching), and that support skin tones, is a nontrivial problem.  The sample code that you are likely to find online might be just some simple single-code points that skip large numbers of emoji that are created by combinining several characters. Other repositories you might find online aren't up-to-date with the latest versions of Unicode and the Emoji set.
+Getting a complete list of supported (in whatever OS you are running) emoji, and their annotations for tooltips (with additional annotations for searching), and that support skin tones, is a nontrivial problem.  The sample code that you are likely to find online might be just some simple single-code points that skip large numbers of emoji that are created by combining several characters. Other repositories you might find online aren't up-to-date with the latest versions of Unicode and the Emoji set.
 
 The approach that this repository uses is to go to the original sources of emoji characters (Unicode.org) and the CLDR (Common Locale Data Repository) for the annotations. We also, for good measure, cross-reference with Apple's internal annotation dictionary to enhance the searchable keywords and look for inconsistencies and MacOS (and iOS?) overrides.
 
