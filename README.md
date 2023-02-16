@@ -57,7 +57,7 @@ When loading into the client, be sure to ignore emoji that aren't compatible wit
 
 This file contains several structures and methods we use for parsing and manipulating emoji as read from Categories.csv.
 
-It currently supports up to Emoji 14.0; please update `emojiVersionSupportedInThisOSVersion` when a new version of MacOS has been released or announced that will support a subsequent version.
+It currently supports up to Emoji 15.0; please update `emojiVersionSupportedInThisOSVersion` when a new version of MacOS has been released or announced that will support a subsequent version.
 
 `protocol EmojiListProtocol`
 * Implement this protocol to load the emojis from disk and maintain a list of categories, each containing emoji.
@@ -136,8 +136,8 @@ compensate for that.
 
 [Emoji 15.0](https://emojipedia.org/emoji-15.0/) at Emojipedia
 
-[Latest version of Emoji parsed is 15.0, from 2022; not released in MacOS yet.](https://unicode.org/emoji/charts/emoji-versions.html)
-(Emoji 14.0 was released in MacOS 12.3; Emoji 13.0 was in Big Sur and Monterey through 12.2. Emoji 12.1 was in Catalina starting with 10.15.1 — I'm not sure about older OS versions.)
+[Latest version of Emoji parsed is 15.0, from 2022; available in Ventura 13.3 and up.](https://unicode.org/emoji/charts/emoji-versions.html)
+(Emoji 14.0 was bundled in MacOS 12.3; Emoji 13.0 was in Big Sur and Monterey through 12.2. Emoji 12.1 was in Catalina starting with 10.15.1 — I'm not sure about older OS versions.)
 
 [This seems to be the master overview file](http://www.unicode.org/reports/tr51/); it's a good overview of the Emoji data. See [#emoji-data](http://www.unicode.org/reports/tr51/#emoji-data) for links to data files
 

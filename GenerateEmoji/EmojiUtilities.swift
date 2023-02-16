@@ -156,8 +156,8 @@ extension EmojiGroup {
             case (10, _, _): return 0 // Other older 10.x operating systems, just assume it's too early when a version # is required
             case (11, 0 ... 2, _): return 13.0
             case (11, _, _), (12, 0 ... 2, _): return 13.1 // newer Big Sur, older Monterey has Emoji 13.1
-            case (12, _, _), (13, _, _): return 14.0 // Emoji 14.0 in Monterey 12.3+ and early versions of Ventura
-                // Add new row for Emoji 15.0 when it's supported in a later version of Ventura
+            case (12, _, _), (13, 0 ... 2, _): return 14.0 // Emoji 14.0 in Monterey 12.3+ and early versions of Ventura
+            case (13, _, _): return 15.0 // Emoji 15.0 in Ventura 12.3+
 
             default: return 15.0 // the Emoji version we reasonably expect to be in the future OS version not listed here
             }

@@ -33,7 +33,7 @@ private struct EmojiFullInfo {
 class EmojiParser: NSObject, XMLParserDelegate {
     
     static let latestKnownEmojiVersion: Double = 15.0  // corresponding to emoji-test.txt and en.xml data files, which may not be known in OS yet
-    static let latestSupportedEmojiVersion: Double = 14.0   // and to the version supported in this operating system including AppleName.strings
+    static let latestSupportedEmojiVersion: Double = 15.0   // and to the version supported in this operating system including AppleName.strings
     
     // MARK: - Additional Search Terms
     
@@ -109,6 +109,7 @@ class EmojiParser: NSObject, XMLParserDelegate {
         do {
             let data = try encoder.encode(annotations)
             try data.write(to: annotationsOutputURL)
+            print("🔵 SUCCESS: Wrote to \(annotationsOutputURL)")
         } catch {
             print(error)
         }
@@ -117,6 +118,7 @@ class EmojiParser: NSObject, XMLParserDelegate {
             let csvString: String = writeToCSVString()
             let csvData = csvString.data(using: .utf8)
             try csvData?.write(to: categoriesOutputURL)
+            print("🔵 SUCCESS: Wrote to \(categoriesOutputURL)")
         } catch {
             print(error)
         }
