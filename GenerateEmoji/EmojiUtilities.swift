@@ -136,7 +136,7 @@ extension EmojiGroup {
         var groupEmojis: [EmojiInfo] = []
 
         func addGroupedEmojis() {
-            if let groupName = groupName, !groupName.isEmpty {
+            if let groupName, !groupName.isEmpty {
                 let newGroup: EmojiGroup = EmojiGroup(groupName: groupName, emojis: groupEmojis, supportsSkinTones: groupHasSkinTones)
                 groups.append(newGroup)
             }
@@ -165,7 +165,7 @@ extension EmojiGroup {
 
         // Our emoji list indicates the version# each one was introduced starting with version 12.0. Earlier versions are not specified.
         func isSupported(version: Double?) -> Bool {
-            guard let version = version else { return true } // if version is unspecified, assume compatible with ALL
+            guard let version else { return true } // if version is unspecified, assume compatible with ALL
             return emojiVersionSupportedInThisOSVersion >= version
         }
 
@@ -311,18 +311,8 @@ extension String {
     }
 
     fileprivate var foundSkinTones: [SkinTone] {
-        guard let first: UInt32 = SkinTone.allCases.first?.rawValue,
-              let last: UInt32 = SkinTone.allCases.last?.rawValue else { return [] }
-        var result: [SkinTone] = []
-        let toneRange: ClosedRange<UInt32> = first ... last
-        for scalar in unicodeScalars {
-            if toneRange.contains(scalar.value) {
-                if let skinTone = SkinTone(rawValue: scalar.value) {
-                    result.append(skinTone)
-                }
-            }
-        }
-        return result
+        // Get all the SkinTones found in this String going through each of the scalars one by one
+        unicodeScalars.compactMap { scalar in SkinTone(rawValue: scalar.value) }
     }
 }
 
