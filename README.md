@@ -121,6 +121,16 @@ Make sure that the skin tones look as expected - if the emoji version is greater
 
 For the categories, an ordered list of all supported emoji, unicode versions, and skin-tone variations, we parse the [latest version of this file](https://unicode.org/Public/emoji/latest/emoji-test.txt). (Note that this links to the latest *released* version, so there may be a newer version than this.)
 
+### Shortcodes (a.k.a. emoji cheat sheet)
+
+The [Emojibase shortcodes list](https://emojibase.dev/shortcodes/?shortcodePresets=emojibase&genders=false) seems to be the best-maintained of several similar lists. 
+
+We're using the [raw English json file](https://github.com/milesj/emojibase/blob/master/packages/data/en/shortcodes/emojibase.raw.json) to parse.
+
+Also, [their shortcodes list](https://github.com/milesj/emojibase/blob/master/packages/generator/src/resources/shortcodes.ts) has some rules about parsing.
+
+Note that this only goes up to Emoji 14.0 so we're adding in our own unofficial Emoji 15 strings as a stop-gap.
+
 ### AppleName.strings
 
 For additional descriptions, and just for cross-referencing, this is the list of unicode and their strings from MacOS.

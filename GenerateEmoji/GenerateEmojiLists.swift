@@ -51,7 +51,8 @@ class EmojiParser: NSObject, XMLParserDelegate {
     var initialAnnotations: [String: [String]] = [:] // Annotations loaded from raw file; several keys are not fully-qualified versions of the emoji
     var annotations: [String: [String]] = [:]        // cleaned up
     var appleNames: [String: AnyObject]  = [:]
-    
+    var emojibase: [String: Set<String>]  = [:]
+
     // MARK: Parsing
     
     let desktopURL = URL(fileURLWithPath: NSString("~/Desktop").expandingTildeInPath)       // Working directory for input and output files
@@ -69,7 +70,8 @@ class EmojiParser: NSObject, XMLParserDelegate {
         let emojiTestURL = desktopURL.appendingPathComponent("emoji-test.txt")
         let cldrAnnotationsURL = desktopURL.appendingPathComponent("en.xml")
         let appleNameStringsURL = desktopURL.appendingPathComponent("AppleName.strings")
-        for url in [emojiTestURL, cldrAnnotationsURL, appleNameStringsURL] {
+        let emojibaseURL = desktopURL.appendingPathComponent("emojibase.raw.json")
+        for url in [emojiTestURL, cldrAnnotationsURL, appleNameStringsURL, emojibaseURL] {
             if !FileManager.default.fileExists(atPath: url.path) {
                 fatalError("🔴 Couldn't find file: \(url.path)")
             }
@@ -94,6 +96,14 @@ class EmojiParser: NSObject, XMLParserDelegate {
         } else {
             fatalError("Couldn't read \(appleNameStringsURL.path)")
         }
+
+        // Emojibase annotations
+        if let emojibaseContents = try? Data(contentsOf: emojibaseURL) {
+            parseEmojibaseDictionary(data: emojibaseContents)
+        } else {
+            fatalError("Couldn't read \(emojibaseURL.path)")
+        }
+
     }
     
     // MARK: Output
@@ -358,7 +368,48 @@ class EmojiParser: NSObject, XMLParserDelegate {
             appleNames = parsed
         }
     }
-    
+
+    func parseEmojibaseDictionary(data: Data) {
+        if let parsed = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:AnyObject] {
+            var newDictionary: [String: Set<String>] = [:]
+            for (key, value) in parsed {
+                var stringSet: Set<String>
+                if let stringValue = value as? String {
+                    stringSet = [stringValue]
+                } else {
+                    stringSet = Set(value as? [String] ?? [])
+                }
+                var updatedStringSet: Set<String> = stringSet
+                for string in stringSet {
+
+                    //*  - Emoji that are SUFFIXED with "face" should have a shortcode
+                    //*    with the face suffix, and another shorthand equivalent.
+                    //*    Example: "worried_face", "worried"
+                    if string.hasSuffix("_face") {  // 5 characters
+                        updatedStringSet.insert(String(string.dropLast(5)))
+                    }
+
+                    //*  - Emoji in the form of "person <action>" should also include
+                    //*    shortcodes without the person prefix, in which they denote
+                    //*    verbs/nouns. Example: "person_swimming", "swimming", "swimmer"
+                    if string.hasPrefix("person_") {    // 7 characters
+                        updatedStringSet.insert(String(string.dropFirst(7)))
+                    }
+                }
+
+
+                let emoji: String = key.components(separatedBy: dashCharacterSet)
+                    .compactMap { UInt32($0, radix: 16) }
+                    .compactMap { Unicode.Scalar($0) }
+                    .string
+                newDictionary[emoji] = updatedStringSet
+            }
+            emojibase = newDictionary
+        }
+    }
+
+    private lazy var dashCharacterSet = CharacterSet(charactersIn: "-")
+
     // MARK: "Test file" parsing
     
     func parseTestFile(contents: String) {

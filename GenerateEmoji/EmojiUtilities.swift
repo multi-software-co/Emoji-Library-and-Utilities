@@ -316,7 +316,7 @@ extension String {
     }
 }
 
-private extension Sequence where Element == UnicodeScalar {
+extension Sequence where Element == UnicodeScalar {
     var string: String { .init(String.UnicodeScalarView(self)) }
 }
 
