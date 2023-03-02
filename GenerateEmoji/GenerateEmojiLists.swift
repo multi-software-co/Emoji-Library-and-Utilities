@@ -42,7 +42,19 @@ class EmojiParser: NSObject, XMLParserDelegate {
         ["ska", "ghost town", "walt jabsco", "magritte"],
         "🎃": ["pumpkin"],
         "⭕": ["remotion"],
-        "🐶": ["pup", "puppy", "doge", "doggo"]
+        "🐶": ["pup", "puppy", "doge", "doggo"],
+
+        // Some additional terms to compensate for Emojibase not yet having Emoji 15.0. These are some likely short terms in that style.
+        "🩵": ["lightblue heart"],
+        "🫷": ["lefthand"],
+        "🫸": ["righthand"],
+        "🐦‍⬛": ["blackbird"],
+        "🫚": ["ginger"],
+        "🫛": ["peapod"],
+        "🪭": ["fan"],
+        "🪮": ["hairpick"],
+        "🛜": ["wifi"],
+
     ]
     
     // MARK: Data
@@ -50,8 +62,8 @@ class EmojiParser: NSObject, XMLParserDelegate {
     fileprivate static var emojiFullGroups: [EmojiFullGroup] = []
     var initialAnnotations: [String: [String]] = [:] // Annotations loaded from raw file; several keys are not fully-qualified versions of the emoji
     var annotations: [String: [String]] = [:]        // cleaned up
-    var appleNames: [String: AnyObject]  = [:]
-    var emojibase: [String: Set<String>]  = [:]
+    var appleNames: [String: String]  = [:]
+    var emojibases: [String: Set<String>]  = [:]
 
     // MARK: Parsing
     
@@ -115,6 +127,7 @@ class EmojiParser: NSObject, XMLParserDelegate {
         
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys  // keep the keys sorted so that a new version of this file isn't rearranged from previous
+        encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
         
         do {
             let data = try encoder.encode(annotations)
@@ -220,126 +233,164 @@ class EmojiParser: NSObject, XMLParserDelegate {
     
     // MARK: Cross-referencing 
     
-    func crossReference() {
-        
-        var appleNamesRemaining = appleNames
-        var hasPrintedAppleNamesHeader = false
-        
+    fileprivate func crossReferenceSingle(_ emoji: EmojiFullInfo,
+                                          _ appleNamesRemaining: inout [String: String],
+                                          _ emojibasesRemaining: inout [String: Set<String>],
+                                          _ hasPrintedAppleNamesHeader: inout Bool,
+                                          _ group: EmojiFullGroup) {
+
         // stop words. Hand-picked by finding which words from a big Internet stopwords list were actually found, then paring it way down
         let stopWords: Set<String> = ["in", "for", "and", "a", "an", "its", "from", "on", "off", "with", "of", "or", "over", "as", "the", "at"]
-        
-        for group in Self.emojiFullGroups {
-            for emoji in group.emojis {
-                
-                // Look for this emoji in AppleNames
-                var appleName: String? = appleNames[emoji.string] as? String
-                if appleName != nil {
-                    appleNamesRemaining.removeValue(forKey: emoji.string)
-                } else if let matchedFromUnqualified = appleNames.first(where: { (key: String, value: AnyObject) in
-                    emoji.unqualifieds.contains(key)
-                }) {
-                    appleName = matchedFromUnqualified.value as? String
-                    appleNamesRemaining.removeValue(forKey: matchedFromUnqualified.key)
-                    
-                    // Last ditch: There are several emoji in AppleNames that have FE0F in them even though it's not specified as fully-qualified!
-                    // Let's see if we can add the FE0F and see if we can match it there.
-                    
-                } else if let matchedFromAddingVariationSelector = appleNames[emoji.string.addedVariationSelector] {
-                    appleName = matchedFromAddingVariationSelector as? String
-                    appleNamesRemaining.removeValue(forKey: emoji.string.addedVariationSelector)
-                } else {
-                    if (emoji.version ?? 0) <= Self.latestSupportedEmojiVersion {
-                        // Don't complain if it's in a version of emoji which we know isn't listed here yet.
-                        let values = emoji.string.dumpScalars
-                        if !hasPrintedAppleNamesHeader {
-                            print("""
+
+        // Look for this emoji in AppleNames
+        var appleName: String? = appleNames[emoji.string]
+        if appleName != nil {
+            appleNamesRemaining.removeValue(forKey: emoji.string)
+        } else if let matchedFromUnqualified = appleNames.first(where: { (key: String, value: String) in
+            emoji.unqualifieds.contains(key)
+        }) {
+            appleName = matchedFromUnqualified.value
+            appleNamesRemaining.removeValue(forKey: matchedFromUnqualified.key)
+
+            // Last ditch: There are several emoji in AppleNames that have FE0F in them even though it's not specified as fully-qualified!
+            // Let's see if we can add the FE0F and see if we can match it there.
+
+        } else if let matchedFromAddingVariationSelector = appleNames[emoji.string.addedVariationSelector] {
+            appleName = matchedFromAddingVariationSelector
+            appleNamesRemaining.removeValue(forKey: emoji.string.addedVariationSelector)
+        } else {
+            if (emoji.version ?? 0) <= Self.latestSupportedEmojiVersion {
+                // Don't complain if it's in a version of emoji which we know isn't listed here yet.
+                let values = emoji.string.dumpScalars
+                if !hasPrintedAppleNamesHeader {
+                    print("""
                                 🔵 APPLE NAMES CROSS-REF: Ignoring newer than \(Self.latestSupportedEmojiVersion). \
                                 Several minor flags and a few others have been noted to be lacking in AppleNames; \
                                 it's not clear why...
                                 """)
-                            hasPrintedAppleNamesHeader = true
-                        }
-                        print("🔵 \(emoji.string) \(values) '\(emoji.info)' NOT FOUND in AppleNames ")
-                        /*
-                         Several minor flags are not listed in AppleNames - no biggie.
-                         
-                         Also these - Not easy to confirm. I do see we have 1f4ac speech bubble but not left speech bubble. Oh well.
-                         Female/Male just missing!
-                         🗨️ 1F5E8 FE0F 'left speech bubble' NOT FOUND in AppleNames 
-                         ♀️ 2640 FE0F 'female sign' NOT FOUND in AppleNames 
-                         ♂️ 2642 FE0F 'male sign' NOT FOUND in AppleNames 
-                         */
-                    }
+                    hasPrintedAppleNamesHeader = true
                 }
-                
-                // We have emoji.info and appleName already
-                var annotationsFromXML: [String]?
-                
-                // First lookup, by main fully-qualified emoji string
-                if let foundAnnotations: [String] = initialAnnotations[emoji.string] {
-                    annotationsFromXML = foundAnnotations
-                    initialAnnotations.removeValue(forKey: emoji.string)
-                    
-                    // Second try: by unqualified versions of the emoji which might match the XML file
-                } else if let matchingKeyValue = initialAnnotations.first(where: { emoji.unqualifieds.contains($0.key) } ) {
-                    
-                    annotationsFromXML = matchingKeyValue.value
-                    // Remove the OLD annotation, with the wrong key, from our dictionary, before replacing with new key
-                    initialAnnotations.removeValue(forKey: matchingKeyValue.key)
-                }
-                
-                // Handle flags specially; not in our annotations, so use English name.
-                else if group.groupName == "Flags" {
-                    // appleName and emoji.info are very similar so tweak the apple name to resemble as much as possible to avoid near-duplication.
-                    if let originalAppleName = appleName {
-                        appleName = originalAppleName
-                            .replacingOccurrences(of: "flag of the", with: "flag:")
-                            .replacingOccurrences(of: "flag of", with: "flag:")
-                            .replacingOccurrences(of: "Saint ", with: "St. ")
-                            .replacingOccurrences(of: " the ", with: " ")
-                            .replacingOccurrences(of: " US ", with: " U.S. ")
-                    }
-                }
-                
-                // Build annotations out of, in this order of precedence:
-                // mainAnnotationFromXML     // highest priority since it's newest inclusive term
-                // appleName
-                // moreAnnotationsFromXML
-                // emoji.info - last fallback
-                var possibleAnnotations: [String] = annotationsFromXML ?? []
-                if let appleName = appleName {
-                    let appleNameLowercased = appleName.lowercased()
-                    if !possibleAnnotations.contains(where: { $0.lowercased() == appleNameLowercased }) {
-                        // print("⭕️ \(emoji.string) AppleName: \(appleName) not found in \(possibleAnnotations)")
-                    }
-                    possibleAnnotations.append(appleName)
-                }
-                possibleAnnotations.append(emoji.info)
-                
-                let mainAnnotation: String = possibleAnnotations.first! // always keep the first term intact - this will be the main annotation
-                
-                let separators: CharacterSet = CharacterSet(charactersIn: " “”(),:")
-                
-                let lowercasedAlreadyUsing = mainAnnotation.lowercased().components(separatedBy: separators).filter { word in !word.isEmpty }
-                var searchTerms: [String] = []
-                for phraseCandidate in possibleAnnotations.dropFirst() {
-                    for word in phraseCandidate.components(separatedBy: separators).filter({ word in !word.isEmpty }) {
-                        let wordLowercased = word.lowercased()
-                        if !stopWords.contains(wordLowercased),
-                           !lowercasedAlreadyUsing.contains(wordLowercased),
-                           !searchTerms.contains(wordLowercased) {
-                            searchTerms.append(word)
-                        }
-                    }
-                }
-                if searchTerms.isEmpty {
-                    annotations[emoji.string] = [mainAnnotation] // store modified item back into dictionary
+                print("🔵 \(emoji.string) \(values) '\(emoji.info)' NOT FOUND in AppleNames ")
+                /*
+                 Several minor flags are not listed in AppleNames - no biggie.
+
+                 Also these - Not easy to confirm. I do see we have 1f4ac speech bubble but not left speech bubble. Oh well.
+                 Female/Male just missing!
+                 🗨️ 1F5E8 FE0F 'left speech bubble' NOT FOUND in AppleNames
+                 ♀️ 2640 FE0F 'female sign' NOT FOUND in AppleNames
+                 ♂️ 2642 FE0F 'male sign' NOT FOUND in AppleNames
+                 */
+            }
+        }
+
+        // Look for this emoji in Emojibase
+        var emojibaseSet: Set<String>? = emojibases[emoji.string]
+        if emojibaseSet != nil {
+            emojibasesRemaining.removeValue(forKey: emoji.string)
+        } else if let matchedFromUnqualified = emojibases.first(where: { (key: String, value: Set<String>) in
+            emoji.unqualifieds.contains(key)
+        }) {
+            emojibaseSet = matchedFromUnqualified.value
+            emojibasesRemaining.removeValue(forKey: matchedFromUnqualified.key)
+        } else {
+            if (emoji.version ?? 0) <= Self.latestSupportedEmojiVersion {
+                // Don't complain if it's in a version of emoji which we know isn't listed here yet.
+                let values = emoji.string.dumpScalars
+                if emoji.version ?? 0 == 15.0 {
+                    print("🔵 \(emoji.string) \(values) '\(emoji.info)' Emojibase doesn't support Emoji 15.0 yet; that's OK")
                 } else {
-                    let searchTermsJoined = searchTerms.joined(separator: " ")
-                    annotations[emoji.string] = [mainAnnotation, searchTermsJoined] // store modified item back into dictionary
+                    print("🔵 \(emoji.string) \(values) '\(emoji.info)' NOT FOUND in Emojibase - This is not expected!")
                 }
             }
         }
+
+        // We have emoji.info and appleName and emojibase(s) already
+        var annotationsFromXML: [String]?
+
+        // First lookup, by main fully-qualified emoji string
+        if let foundAnnotations: [String] = initialAnnotations[emoji.string] {
+            annotationsFromXML = foundAnnotations
+            initialAnnotations.removeValue(forKey: emoji.string)
+
+            // Second try: by unqualified versions of the emoji which might match the XML file
+        } else if let matchingKeyValue = initialAnnotations.first(where: { emoji.unqualifieds.contains($0.key) } ) {
+
+            annotationsFromXML = matchingKeyValue.value
+            // Remove the OLD annotation, with the wrong key, from our dictionary, before replacing with new key
+            initialAnnotations.removeValue(forKey: matchingKeyValue.key)
+        }
+
+        // Handle flags specially; not in our annotations, so use English name.
+        else if group.groupName == "Flags" {
+            // appleName and emoji.info are very similar so tweak the apple name to resemble as much as possible to avoid near-duplication.
+            if let originalAppleName = appleName {
+                appleName = originalAppleName
+                    .replacingOccurrences(of: "flag of the", with: "flag:")
+                    .replacingOccurrences(of: "flag of", with: "flag:")
+                    .replacingOccurrences(of: "Saint ", with: "St. ")
+                    .replacingOccurrences(of: " the ", with: " ")
+                    .replacingOccurrences(of: " US ", with: " U.S. ")
+            }
+        }
+
+        // Build annotations out of, in this order of precedence:
+        // mainAnnotationFromXML     // highest priority since it's newest inclusive term
+        // emojibase
+        // appleName
+        // moreAnnotationsFromXML
+        // emoji.info - last fallback
+        var possibleAnnotations: [String] = annotationsFromXML ?? []
+        if let emojibaseSet = emojibaseSet {
+            let cleanedEmojibaseArray = Array(emojibaseSet).map { $0.lowercased().replacingOccurrences(of: "_", with: " ") }
+            possibleAnnotations.append(contentsOf: cleanedEmojibaseArray)
+        }
+
+        if let appleName = appleName {
+            let appleNameLowercased = appleName.lowercased()
+            if !possibleAnnotations.contains(where: { $0.lowercased() == appleNameLowercased }) {
+                // print("⭕️ \(emoji.string) AppleName: \(appleName) not found in \(possibleAnnotations)")
+            }
+            possibleAnnotations.append(appleName)
+        }
+        possibleAnnotations.append(emoji.info)
+
+        let mainAnnotation: String = possibleAnnotations.first! // always keep the first term intact - this will be the main annotation
+
+        let separators: CharacterSet = CharacterSet(charactersIn: " “”(),:")
+
+        let lowercasedAlreadyUsing = mainAnnotation.lowercased().components(separatedBy: separators).filter { word in !word.isEmpty }
+        var searchTerms: [String] = []
+        for phraseCandidate in possibleAnnotations.dropFirst() {
+            for word in phraseCandidate.components(separatedBy: separators).filter({ word in !word.isEmpty }) {
+                let wordLowercased = word.lowercased()
+                if !stopWords.contains(wordLowercased),
+                   !lowercasedAlreadyUsing.contains(wordLowercased),
+                   !searchTerms.contains(wordLowercased) {
+                    searchTerms.append(word)
+                }
+            }
+        }
+        if searchTerms.isEmpty {
+            annotations[emoji.string] = [mainAnnotation] // store modified item back into dictionary
+        } else {
+            let searchTermsJoined = searchTerms.joined(separator: " ")
+            annotations[emoji.string] = [mainAnnotation, searchTermsJoined] // store modified item back into dictionary
+        }
+    }
+
+    func crossReference() {
+        
+        var appleNamesRemaining = appleNames
+        var emojibasesRemaining = emojibases
+        var hasPrintedAppleNamesHeader = false
+        
+        for group in Self.emojiFullGroups {
+            for emoji in group.emojis {
+                crossReferenceSingle(emoji, &appleNamesRemaining, &emojibasesRemaining, &hasPrintedAppleNamesHeader, group)
+            }
+        }
+
+        // Check for problems
         
         print("\n\n🔵 Remaining appleNames not matched in our lists.")
         print("👩‍🤝‍👨👨‍🤝‍👨👩‍🤝‍👩🫱‍🫲 are known and inconsequential; they use a long 2-skintone variation when emoji-test has the short one.")
@@ -364,7 +415,7 @@ class EmojiParser: NSObject, XMLParserDelegate {
     // MARK: AppleName parsing
     
     func parseAppleNameDictionary(data: Data) {
-        if let parsed = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:AnyObject] {
+        if let parsed = try? JSONSerialization.jsonObject(with: data, options: .mutableContainers) as? [String:String] {
             appleNames = parsed
         }
     }
@@ -404,7 +455,7 @@ class EmojiParser: NSObject, XMLParserDelegate {
                     .string
                 newDictionary[emoji] = updatedStringSet
             }
-            emojibase = newDictionary
+            emojibases = newDictionary
         }
     }
 
