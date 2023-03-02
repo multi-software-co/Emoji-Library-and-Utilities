@@ -127,7 +127,6 @@ class EmojiParser: NSObject, XMLParserDelegate {
         
         let encoder = JSONEncoder()
         encoder.outputFormatting = .sortedKeys  // keep the keys sorted so that a new version of this file isn't rearranged from previous
-        encoder.outputFormatting = [.sortedKeys, .prettyPrinted]
         
         do {
             let data = try encoder.encode(annotations)
