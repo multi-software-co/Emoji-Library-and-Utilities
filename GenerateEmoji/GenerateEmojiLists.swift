@@ -333,24 +333,23 @@ class EmojiParser: NSObject, XMLParserDelegate {
         }
 
         // Build annotations out of, in this order of precedence:
-        // mainAnnotationFromXML     // highest priority since it's newest inclusive term
-        // emojibase
+        // annotationsFromXML     // highest priority since it's newest inclusive term
         // appleName
         // moreAnnotationsFromXML
+        // emojibase
         // emoji.info - last fallback
         var possibleAnnotations: [String] = annotationsFromXML ?? []
+
+        if let appleName = appleName {
+            let appleNameLowercased = appleName.lowercased()
+            possibleAnnotations.append(appleName)
+        }
+
         if let emojibaseSet = emojibaseSet {
             let cleanedEmojibaseArray = Array(emojibaseSet).map { $0.lowercased().replacingOccurrences(of: "_", with: " ") }
             possibleAnnotations.append(contentsOf: cleanedEmojibaseArray)
         }
 
-        if let appleName = appleName {
-            let appleNameLowercased = appleName.lowercased()
-            if !possibleAnnotations.contains(where: { $0.lowercased() == appleNameLowercased }) {
-                // print("⭕️ \(emoji.string) AppleName: \(appleName) not found in \(possibleAnnotations)")
-            }
-            possibleAnnotations.append(appleName)
-        }
         possibleAnnotations.append(emoji.info)
 
         let mainAnnotation: String = possibleAnnotations.first! // always keep the first term intact - this will be the main annotation
