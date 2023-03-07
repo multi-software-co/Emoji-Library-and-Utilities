@@ -15,7 +15,10 @@ let package = Package(
     targets: [
         .target(
             name: "EmojiUtilities",
-            dependencies: []),
+            dependencies: [],
+            resources: [
+                .process("Generated")
+            ]),
         .executableTarget(
             name: "GenerateEmoji",
             dependencies: [
