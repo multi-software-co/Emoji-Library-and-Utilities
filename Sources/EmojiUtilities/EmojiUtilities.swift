@@ -8,7 +8,7 @@
 
 import Foundation
 
-protocol EmojiListProtocol {
+public protocol EmojiListProtocol {
     static var sharedInstance: any EmojiListProtocol { get }
 
     var allEmojiGroups: [EmojiGroup] { get }
@@ -17,7 +17,7 @@ protocol EmojiListProtocol {
 // MARK: - Common Structs & Enums
 
 /// Five skin tones supported by Emoji. Values are internal codes used to modify the base emoji string
-enum SkinTone: UInt32, CaseIterable {
+public enum SkinTone: UInt32, CaseIterable {
     case light = 0x1F3FB
     case mediumLight = 0x1F3FC
     case medium = 0x1F3FD
@@ -26,25 +26,37 @@ enum SkinTone: UInt32, CaseIterable {
 }
 
 /// Emoji grouped by category
-struct EmojiGroup {
-    let groupName: String
-    var emojis: [EmojiInfo]
-    var supportsSkinTones: Bool
+public struct EmojiGroup {
+    public init(groupName: String, emojis: [EmojiInfo], supportsSkinTones: Bool) {
+        self.groupName = groupName
+        self.emojis = emojis
+        self.supportsSkinTones = supportsSkinTones
+    }
+    
+    public let groupName: String
+    public let emojis: [EmojiInfo]
+    public let supportsSkinTones: Bool
 }
 
 /// Emoji we are keeping in memory; a subset of EmojiFullInfo
-struct EmojiInfo {
-    let string: String // The emoji itself
-    let toneSupport: ToneSupport // Whether it can do skin tones
-    let toneBaseString: String? // if supports skin tones, this may be our basis rather than the main emoji
+public struct EmojiInfo {
+    public init(string: String, toneSupport: ToneSupport, toneBaseString: String? = nil) {
+        self.string = string
+        self.toneSupport = toneSupport
+        self.toneBaseString = toneBaseString
+    }
+    
+    public let string: String // The emoji itself
+    public let toneSupport: ToneSupport // Whether it can do skin tones
+    public let toneBaseString: String? // if supports skin tones, this may be our basis rather than the main emoji
 }
 
 /// How many tones an emoji supports
-enum ToneSupport: Int, CaseIterable {
+public enum ToneSupport: Int, CaseIterable {
     case none, one, two
 }
 
-extension EmojiListProtocol {
+public extension EmojiListProtocol {
     // MARK: - Toned to base lookup
 
     /// Brute force searches for base emoji from a toned emoji by looking for probable matches from the first character and then applying that
@@ -124,7 +136,7 @@ extension EmojiListProtocol {
 
 // MARK: - Loading
 
-extension EmojiGroup {
+public extension EmojiGroup {
     static func loadEmojiGroupsFrom(data emojiData: Data) -> [EmojiGroup] {
         guard let dataString: String = String(data: emojiData, encoding: .utf8)
         else {
@@ -241,7 +253,7 @@ extension EmojiGroup {
 
 // MARK: - Utility methods for manipulating emoji strings
 
-extension String {
+public extension String {
     /// Add Variation Selector 0xFE0F to make a non-emoji into an emoji when applicable
     var addedVariationSelector: String {
         var scalars = [UnicodeScalar]()
@@ -316,7 +328,7 @@ extension String {
     }
 }
 
-extension Sequence where Element == UnicodeScalar {
+public extension Sequence where Element == UnicodeScalar {
     var string: String { .init(String.UnicodeScalarView(self)) }
 }
 
