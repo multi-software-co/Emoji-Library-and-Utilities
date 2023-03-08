@@ -8,6 +8,11 @@
 
 import Foundation
 
+public enum EmojiUtilities {
+    static public let emojiCategoriesURL: URL? = Bundle.module.url(forResource: "Categories", withExtension: "csv")
+    static public let emojiAnnotations_enURL: URL? = Bundle.module.url(forResource: "EmojiAnnotations-en", withExtension: "json")
+}
+
 public protocol EmojiListProtocol {
     static var sharedInstance: any EmojiListProtocol { get }
 
@@ -138,7 +143,7 @@ public extension EmojiListProtocol {
 
 public extension EmojiGroup {
     static func loadEmojiGroups() -> [EmojiGroup] {
-        guard let indexURL: URL = Bundle.module.url(forResource: "Categories", withExtension: "csv"),
+        guard let indexURL: URL = EmojiUtilities.emojiCategoriesURL,
               let emojiData: Data = try? Data(contentsOf: indexURL)
         else {
             fatalError("Error reading emoji Categories file")
