@@ -73,8 +73,11 @@ It currently supports up to Emoji 15.0; please update `emojiVersionSupportedInTh
 
 `struct EmojiGroup`
 * A group of emoji with its name and a list of emoji in that group. Also contains flag to indicate if skin tones are supported in this group.
-* `func loadEmojiGroupsFrom(data emojiData: Data) -> [EmojiGroup]`
-   * Utility method to load emojis from the **Categories.csv** file.
+* `func loadEmojiGroups() -> [EmojiGroup]`
+   * Utility method to load emojis from the included **Categories.csv** file.
+
+* `func loadEmojiGroupsFrom(string dataString: String) -> [EmojiGroup]`
+   * Utility method to load emojis from a string of emoji information you provide.
 
 `struct EmojiInfo`
 * A single emoji string with information about skin-tone support.

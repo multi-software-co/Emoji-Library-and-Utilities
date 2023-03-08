@@ -137,11 +137,22 @@ public extension EmojiListProtocol {
 // MARK: - Loading
 
 public extension EmojiGroup {
-    static func loadEmojiGroupsFrom(data emojiData: Data) -> [EmojiGroup] {
+    static func loadEmojiGroups() -> [EmojiGroup] {
+        guard let indexURL: URL = Bundle.module.url(forResource: "Categories", withExtension: "csv"),
+              let emojiData: Data = try? Data(contentsOf: indexURL)
+        else {
+            fatalError("Error reading emoji Categories file")
+        }
+
         guard let dataString: String = String(data: emojiData, encoding: .utf8)
         else {
             fatalError("Error decoding emoji Categories file")
         }
+
+        return loadEmojiGroupsFrom(string: dataString)
+    }
+
+    static func loadEmojiGroupsFrom(string dataString: String) -> [EmojiGroup] {
         var groups: [EmojiGroup] = []
         var groupName: String?
         var groupHasSkinTones: Bool = false
