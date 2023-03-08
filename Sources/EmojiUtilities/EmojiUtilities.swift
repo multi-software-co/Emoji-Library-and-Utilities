@@ -26,7 +26,7 @@ public enum SkinTone: UInt32, CaseIterable {
 }
 
 /// Emoji grouped by category
-public struct EmojiGroup {
+public struct EmojiGroup: Hashable {
     public init(groupName: String, emojis: [EmojiInfo], supportsSkinTones: Bool) {
         self.groupName = groupName
         self.emojis = emojis
@@ -39,7 +39,7 @@ public struct EmojiGroup {
 }
 
 /// Emoji we are keeping in memory; a subset of EmojiFullInfo
-public struct EmojiInfo {
+public struct EmojiInfo: Hashable {
     public init(string: String, toneSupport: ToneSupport, toneBaseString: String? = nil) {
         self.string = string
         self.toneSupport = toneSupport
