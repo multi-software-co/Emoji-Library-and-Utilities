@@ -27,7 +27,7 @@ Also, do this when Apple updates MacOS and there is new support for newer versio
 
 ## Instructions
 
-The easiest way to make use of this repository is to just put **Categories.csv** and **EmojiAnnotations-en.json** into your project, along with **EmojiUtilities.swift**, and use the code there to parse and load the emojis into your project.
+The easiest way to make use of this repository is to just include this package as a dependency using Swift Package Manager and including the **EmojiUtilities** product as a dependency by adding `.product(name: "EmojiUtilities", package: "Emoji-Library-and-Utilities"),` to your target. Then use `loadEmojiGroups` (more info below) to parse and load the emojis into your project.
 
 ## The Data Files
 
