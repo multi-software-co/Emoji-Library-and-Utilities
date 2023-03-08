@@ -9,3 +9,6 @@
 *.xcuserstate
 project.xcworkspace/
 xcuserdata/
+
+# SwiftPM
+.build/

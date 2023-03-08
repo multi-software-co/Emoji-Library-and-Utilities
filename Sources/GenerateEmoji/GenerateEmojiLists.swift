@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import EmojiUtilities
 
 // MARK: - Support for saving/loading
 

@@ -27,7 +27,7 @@ Also, do this when Apple updates MacOS and there is new support for newer versio
 
 ## Instructions
 
-The easiest way to make use of this repository is to just put **Categories.csv** and **EmojiAnnotations-en.json** into your project, along with **EmojiUtilities.swift**, and use the code there to parse and load the emojis into your project.
+The easiest way to make use of this repository is to just include this package as a dependency using Swift Package Manager and including the **EmojiUtilities** product as a dependency by adding `.product(name: "EmojiUtilities", package: "Emoji-Library-and-Utilities"),` to your target. Then use `loadEmojiGroups` (more info below) to parse and load the emojis into your project.
 
 ## The Data Files
 
@@ -73,8 +73,11 @@ It currently supports up to Emoji 15.0; please update `emojiVersionSupportedInTh
 
 `struct EmojiGroup`
 * A group of emoji with its name and a list of emoji in that group. Also contains flag to indicate if skin tones are supported in this group.
-* `func loadEmojiGroupsFrom(data emojiData: Data) -> [EmojiGroup]`
-   * Utility method to load emojis from the **Categories.csv** file.
+* `func loadEmojiGroups() -> [EmojiGroup]`
+   * Utility method to load emojis from the included **Categories.csv** file.
+
+* `func loadEmojiGroupsFrom(string dataString: String) -> [EmojiGroup]`
+   * Utility method to load emojis from a string of emoji information you provide.
 
 `struct EmojiInfo`
 * A single emoji string with information about skin-tone support.
