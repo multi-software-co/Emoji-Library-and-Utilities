@@ -105,7 +105,9 @@ It currently supports up to Emoji 15.0; please update `emojiVersionSupportedInTh
 
 If you want to generate your own emoji list, either with an updated Emoji version or to adjust what gets created, then run this project to generate the data files mentioned above.
 
-Download & prepare the files listed below (1, 2, 3) and place on your Desktop. Then run the GenerateEmoji app (from within Xcode).
+Download & prepare the files listed below (1, 2, 3) and place on your Desktop. 
+
+Then open up "Package.swift" (instead of a project file!) and choose the "GenerateEmoji" target. Run the tool from Xcode.
 
 The output includes a bunch of diagnostic output to help look for inconsistencies. Some inconsistencies are OK as long as they are worked around.
 Make sure that the skin tones look as expected - if the emoji version is greater than what's supported by the current OS, expect to see oddities!
